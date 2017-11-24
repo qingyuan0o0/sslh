@@ -1,0 +1,25 @@
+[Unit]
+Description=sslh
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=-/usr/bin/docker pull atomney/sslh
+ExecStart=/usr/bin/docker run --rm --name %n -p 443:443 -m 16m atomney/sslh
+ExecStart=/usr/bin/docker run --rm -p 443:443 --name %n \
+        -e LISTEN_IP=0.0.0.0 \
+        -e LISTEN_PORT=443 \
+        -e SSH_HOST=172.17.0.1 \
+        -e HTTPS_HOST=172.17.0.1 \
+        -e OPENVPN_HOST=172.17.0.1 \
+        atomney/sslh
+
+
+ExecStop=/usr/bin/docker stop %n
+
+[Install]
+WantedBy=multi-user.target
