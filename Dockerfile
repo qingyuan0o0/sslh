@@ -1,7 +1,6 @@
 FROM ubuntu:xenial
-MAINTAINER atomney <atomney+docker@gmail.com>
 
-# Tell APT that humans aren't going to answer package questions
+# 告诉APT，不回答打包问题
 ENV DEBIAN_FRONTEND noninteractive
 
 ENV LISTEN_IP 0.0.0.0
@@ -13,15 +12,15 @@ ENV OPENVPN_PORT 1194
 ENV HTTPS_HOST localhost
 ENV HTTPS_PORT 8443
 
-# Install packages
+# 安装包
 RUN apt-get update -y && \
     apt-get install -y sslh && \
     apt-get autoclean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-# PORTS
+# 默认放出端口
 EXPOSE 443
 
-# Set the script to run on container launch
+# 将脚本设置为在容器启动时运行
 CMD sslh -f -u root -p ${LISTEN_IP}:${LISTEN_PORT} --ssh ${SSH_HOST}:${SSH_PORT} --ssl ${HTTPS_HOST}:${HTTPS_PORT} --openvpn ${OPENVPN_HOST}:${OPENVPN_PORT}
