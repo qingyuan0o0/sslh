@@ -11,13 +11,19 @@ ENV OPENVPN_HOST localhost
 ENV OPENVPN_PORT 1194
 ENV HTTPS_HOST localhost
 ENV HTTPS_PORT 8443
+ENV PASSWORD password
 
 # 安装包
 RUN apt-get update -y && \
-    apt-get install -y sslh && \
+    apt-get install -y sslh openssh-server && \
     apt-get autoclean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
+
+RUN echo root:${PASSWORD} |sudo chpasswd root && \
+    sudo sed -i 's/^.*PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config; && \
+    sudo sed -i 's/^.*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config; && \
+    service sshd restart
 
 # 默认放出端口
 EXPOSE 443
